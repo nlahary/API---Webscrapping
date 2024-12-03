@@ -7,3 +7,4 @@ opendatasets
 pytest
 validators
 httpx
+scikit-learn
