@@ -1,0 +1,10 @@
+{
+    "iris": {
+        "name": "iris",
+        "url": "https://www.kaggle.com/api/v1/datasets/download/uciml/iris"
+    },
+    "1000": {
+        "name": "1000",
+        "url": "https://moodle.epf.fr/"
+    }
+}
