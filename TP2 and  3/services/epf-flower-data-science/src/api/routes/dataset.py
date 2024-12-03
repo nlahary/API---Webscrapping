@@ -1,11 +1,6 @@
 from fastapi.responses import JSONResponse
-from src.services.data import Dataset, get_dataset_infos, open_configs_file, write_configs_file, get_iris_dataset, dump_configs_file
+from src.services.data import Dataset, get_dataset_infos, open_configs_file, write_configs_file, dump_configs_file
 from fastapi import APIRouter, HTTPException, status
-import pandas as pd
-from requests.exceptions import HTTPError
-import requests
-import zipfile
-import io
 
 router = APIRouter()
 

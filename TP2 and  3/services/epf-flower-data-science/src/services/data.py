@@ -9,9 +9,10 @@ import json
 import validators
 import pandas as pd
 from requests.exceptions import HTTPError
+from sklearn.model_selection import train_test_split
 
 JSON_CONFIG_PATH = Path(__file__).parent.parent / "config/urls_config.json"
-OUTPUT_FILE_PATH = Path(__file__).parent.parent / "data"
+DATA_FILE_PATH = Path(__file__).parent.parent / "data"
 
 
 class Dataset(BaseModel):
@@ -100,9 +101,46 @@ def download_dataset(dataset_url: str, dataset_name: str) -> None:
     """ Download a dataset from a URL and save it to the data folder """
     try:
         response = requests.get(dataset_url)
-        output_file = OUTPUT_FILE_PATH / f'{dataset_name}.zip'
+        output_file = DATA_FILE_PATH / f'{dataset_name}.zip'
         with open(output_file, "wb") as file:
             file.write(response.content)
     except InvalidURL:
         raise HTTPException(
             status_code=400, detail=f"Invalid URL: {dataset_url}")
+
+
+def get_iris_web() -> pd.DataFrame:
+    """ Download the iris dataset from the URL and return it as a Pandas DataFrame """
+    iris_dataset = get_dataset_infos("iris")
+    response = requests.get(iris_dataset.url)
+    response.raise_for_status()
+
+    with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+        file_names = z.namelist()
+        csv_file_name = next(
+            (name for name in file_names if name.endswith('.csv')), None)
+
+        if csv_file_name is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No CSV file found in the archive.")
+
+        with z.open(csv_file_name) as csv_file:
+            df = pd.read_csv(csv_file)
+
+    return df
+
+
+def get_iris_local() -> pd.DataFrame:
+    """ Get the iris dataset from the data file """
+    return pd.read_csv(DATA_FILE_PATH / "iris.csv")
+
+
+def test_train_split_iris(iris: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    """ Test the train/test split on the iris dataset and return the split as a dictionary """
+
+    X = iris.drop(columns="species")
+    y = iris["species"]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42)
+    return X_train, X_test, y_train, y_test
