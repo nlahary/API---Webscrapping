@@ -1,13 +1,18 @@
 from fastapi.responses import JSONResponse
-from src.services.data import Dataset, get_dataset_infos, open_configs_file, write_configs_file
+from src.services.data import Dataset, get_dataset_infos, open_configs_file, write_configs_file, get_iris_dataset, dump_configs_file
 from fastapi import APIRouter, HTTPException, status
+import pandas as pd
+from requests.exceptions import HTTPError
+import requests
+import zipfile
+import io
 
 router = APIRouter()
 
 
 @router.get("/dataset/{dataset_id}", response_model=Dataset)
 async def get_dataset(dataset_id: str):
-    """ Get the information of a dataset from the configuration file 
+    """ Get the information of a dataset from the configuration file
 
     Args:
         dataset_id (str): The name of the dataset to get
@@ -24,7 +29,7 @@ async def get_dataset(dataset_id: str):
 
 @router.post("/dataset")
 async def post_dataset(dataset: Dataset):
-    """ Add a new dataset to the configuration file 
+    """ Add a new dataset to the configuration file
 
     Args:
         dataset (Dataset): The dataset to add
@@ -81,3 +86,30 @@ async def put_dataset(dataset: Dataset):
             content=updated_dataset_info.dict(),
             status_code=status.HTTP_201_CREATED
         )
+
+
+@router.delete("/dataset/{dataset_id}")
+async def delete_dataset(dataset_id: str):
+    """ Delete a dataset from the configuration file
+
+    Args:
+        dataset_id (str): The name of the dataset to delete
+
+    Returns:
+        204: The dataset was successfully deleted
+
+    Raises:
+        404: The dataset was not found
+        500: The configuration file was not found / Error happened while reading it / Error happened while writing it
+    """
+    datasets = open_configs_file()
+    if dataset_id not in datasets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dataset not found: {dataset_id}")
+    del datasets[dataset_id]
+    dump_configs_file(datasets)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": f"Dataset {dataset_id} was successfully deleted"}
+    )

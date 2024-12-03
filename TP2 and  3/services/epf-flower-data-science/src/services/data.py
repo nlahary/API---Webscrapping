@@ -1,10 +1,14 @@
 from http.client import InvalidURL
+import io
+import zipfile
 from fastapi import HTTPException, status
 from pydantic import BaseModel, validator
 import requests
 from pathlib import Path
 import json
 import validators
+import pandas as pd
+from requests.exceptions import HTTPError
 
 JSON_CONFIG_PATH = Path(__file__).parent.parent / "config/urls_config.json"
 OUTPUT_FILE_PATH = Path(__file__).parent.parent / "data"
@@ -47,12 +51,23 @@ def open_configs_file() -> dict:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Configuration file not found: {JSON_CONFIG_PATH}")
-    except Exception:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while reading the configuration file")
+            detail=f"An error occurred while reading the configuration file: {e}")
     else:
         return datasets
+
+
+def dump_configs_file(datasets: dict) -> None:
+    """ Dump the datasets dictionary to the configuration file """
+    try:
+        with open(JSON_CONFIG_PATH, "w") as file:
+            json.dump(datasets, file, indent=4)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred while writing the configuration file {e}")
 
 
 def write_configs_file(dataset: Dataset) -> None:
@@ -68,7 +83,7 @@ def write_configs_file(dataset: Dataset) -> None:
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while writing the configuration file")
+            detail=f"An error occurred while writing the configuration file {e}")
 
 
 def get_dataset_infos(dataset_id: str) -> Dataset:
