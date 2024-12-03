@@ -93,10 +93,10 @@ async def train_iris():
 
 @router.get('/iris/predict')
 async def predict():
-    accuracy = predict_iris()
+    predicted_labels = predict_iris()
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
-            "accuracy": accuracy
+            "predicted_labels": predicted_labels.tolist()
         }
     )
