@@ -8,3 +8,4 @@ pytest
 validators
 httpx
 scikit-learn
+pytest-asyncio
