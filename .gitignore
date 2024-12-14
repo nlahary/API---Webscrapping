@@ -7,7 +7,7 @@ urls_config.json
 data/
 # C extensions
 *.so
-
+creds/
 # Distribution / packaging
 .Python
 build/
