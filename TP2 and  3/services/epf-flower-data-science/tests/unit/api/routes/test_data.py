@@ -3,9 +3,6 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch, mock_open
 from pathlib import Path
 import json
-import sys
-
-sys.path.append(str(Path(__file__).resolve().parents[4]))
 
 MOCKED_CONFIG_FILE = {
     "test1": {
