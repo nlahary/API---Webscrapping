@@ -26,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           # the dir name is "TP2 and  3" with an extra space 
           pip install -r "TP2 and  3/services/epf-flower-data-science/requirements.txt"          
-          export PYTHONPATH="${PYTHONPATH}:./TP2 and  3/services/epf-flower-data-science"
+          export PYTHONPATH="${PYTHONPATH}:./TP2 and  3/services/epf-flower-data-science/src"
 
       - name: Run tests
         run: |
