@@ -1,9 +1,7 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Request, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import HTTPException, Depends
 from fastapi.responses import JSONResponse
 import requests
-
 from src.services.firebase import (
     get_users,
     set_role,
@@ -13,6 +11,11 @@ from src.services.firebase import (
 )
 
 from src.schemas.firebase import RegisterRequest, FirebaseUser
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address, default_limits=["5 per minute"])
 
 router = APIRouter()
 
@@ -110,7 +113,8 @@ def verify_admin(token: str = Depends(oauth2_scheme)):
 @router.get("/users",
             response_model=list[FirebaseUser],
             dependencies=[Depends(verify_admin)])
-def get_firebase_users():
+@limiter.limit("5/minute")
+def get_firebase_users(request: Request):
     users: list[FirebaseUser] = get_users()
     return JSONResponse(
         status_code=status.HTTP_200_OK,

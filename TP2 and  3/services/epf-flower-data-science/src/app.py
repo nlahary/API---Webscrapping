@@ -3,6 +3,11 @@ from starlette.middleware.cors import CORSMiddleware
 
 from src.api.router import router
 
+from slowapi.middleware import SlowAPIMiddleware
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
 
 def get_application() -> FastAPI:
     application = FastAPI(
@@ -19,6 +24,11 @@ def get_application() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    application.add_middleware(SlowAPIMiddleware)
+    limiter = Limiter(key_func=get_remote_address,
+                      default_limits=["5 per minute"])
+    application.state.limiter = limiter
 
     application.include_router(router)
     return application
