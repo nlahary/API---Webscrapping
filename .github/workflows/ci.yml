@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # ls /TP2\ and\ 3/
+          ls /TP2\ and\ 3/
           pip install -r ./TP2\ and\ 3/services/epf-flower-data-science/requirements.txt
           export PYTHONPATH="${PYTHONPATH}:./TP2 and 3/services/epf-flower-data-science"
 
