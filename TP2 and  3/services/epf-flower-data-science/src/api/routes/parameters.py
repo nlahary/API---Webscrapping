@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, HTTPException, status
 from src.services.firestore import FirestoreClient
-from src.services.firestore import Parameters
+from src.schemas.parameters import Parameters
 
 router = APIRouter()
 
