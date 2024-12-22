@@ -9,3 +9,4 @@ validators
 httpx
 scikit-learn
 pytest-asyncio
+slowapi
