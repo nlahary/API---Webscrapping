@@ -33,6 +33,11 @@ class FirebaseClient:
 
 
 def get_users() -> list[FirebaseUser]:
+    """ Get all users from Firebase.
+
+    Returns:
+        list[FirebaseUser]: List of Firebase users with email, user_id and role.
+    """
     users_list = auth.list_users()
     users = []
     for user in users_list.iterate_all():
@@ -42,6 +47,19 @@ def get_users() -> list[FirebaseUser]:
 
 
 def verify_firebase_token(token: str) -> FirebaseUser:
+    """ Verify the Firebase token and return the user.
+
+    Args:
+        token (str): Firebase token
+
+    Raises:
+        HTTPException: Invalid token
+        HTTPException: Token has expired
+        HTTPException: Invalid token: missing required fields
+
+    Returns:
+        FirebaseUser: User with email, user_id and role.
+    """
     try:
         decoded_token = auth.verify_id_token(token)
         email = decoded_token.get("email")
@@ -69,7 +87,17 @@ def verify_firebase_token(token: str) -> FirebaseUser:
 
 
 def set_role(uid: int, role: str) -> None:
-    if role not in RoleEnum:
+    """ Set the role of a user in Firebase.
+
+    Args:
+        uid (int): User ID
+        role (str): Role
+
+    Raises:
+        HTTPException: Role does not exist
+        HTTPException: Failed to set role
+    """
+    if role not in RoleEnum.__members__:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid role"
@@ -85,6 +113,17 @@ def set_role(uid: int, role: str) -> None:
 
 
 def get_role(uid: int) -> str:
+    """ Get the role of a user in Firebase.
+
+    Args:
+        uid (int): User ID
+
+    Raises:
+        HTTPException: Failed to get role
+
+    Returns:
+        str: Role
+    """
     try:
         user = auth.get_user(uid)
         return user.custom_claims.get("role")

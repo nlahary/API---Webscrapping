@@ -87,6 +87,17 @@ def login_user(request: OAuth2PasswordRequestForm = Depends()):
 
 
 def verify_admin(token: str = Depends(oauth2_scheme)):
+    """ Verify if the user is an admin.
+
+    Args:
+        token (str): Firebase token
+
+    Raises:
+        HTTPException: Unauthorized access
+
+    Returns:
+        FirebaseUser: User with email, user_id and role.
+    """
     payload: FirebaseUser = verify_firebase_token(token)
     if payload.role != "admin":
         raise HTTPException(
