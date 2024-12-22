@@ -24,6 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          ls -la
           pip install -r API---Webscrapping/TP2\ and\ 3/services/epf-flower-data-science/requirements.txt
           export PYTHONPATH="${PYTHONPATH}:./TP2 and 3/services/epf-flower-data-science"
 
